@@ -7,6 +7,7 @@ import torch.nn.functional as F
 from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 from deepfake_data import deepfakeDataset
+from pytorch_model import MesoNet4
 
 #To DO: import model
 
@@ -36,7 +37,7 @@ def main():
 
     #define model
     #TO DO import model
-    #model = ??
+    model = MesoNet4()
 
     #optimizer
     #I have multiple options we can try 
@@ -66,16 +67,16 @@ def main():
             optimizer_adam.zero_grad()
             '''
             #set model to train
-            '''
+            
             model.train()
-            '''
+            
             #get data from dataloader
             image = data['image']
             ground_truth = data['ground_truth']
             #run through model and get prediction
-            '''
+            
             prediction = model(image)
-
+            '''
             #calculate loss
             loss = loss_func_mse(prediction,ground_truth)
             #backprop
@@ -90,6 +91,7 @@ def main():
         #step scheduler, steps based on set step size
         scheduler_adam.setp()
         '''
+        #To Do save model
 
 
 
