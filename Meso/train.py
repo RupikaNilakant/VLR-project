@@ -6,7 +6,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
-from torch.utils.tensorboard import SummaryWriter
 from deepfake_data import deepfakeDataset
 
 #To DO: import model
@@ -16,7 +15,7 @@ def validate(model, test_dataset, writer):
     for batch_idx, data in enumerate(test_dataset_loader):
         image = data['image']
         ground_truth = data['ground_truth']
-        prediction = model.(image)
+        prediction = model(image)
 
         #calc loss
         #calc accuracy
@@ -27,13 +26,13 @@ def validate(model, test_dataset, writer):
 def main():
 
     #set up tensorboard
-    writer = SummaryWriter()
+    #writer = SummaryWriter()
 
     #load dataset
-    train_dataset = deepfakeDataset
-    test_dataset = deepfakeDataset
-    train_dataset_loader = torch.utils.data.DataLoader()
-    test_dataset_loader = torch.utils.data.DataLoader()
+    train_dataset = deepfakeDataset(split='train',image_dir=None)
+    test_dataset = deepfakeDataset(split='valid', image_dir=None)
+    train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
+    test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
 
     #define model
     #TO DO import model
@@ -41,15 +40,17 @@ def main():
 
     #optimizer
     #I have multiple options we can try 
+    '''
     optimizer_adam = torch.optim.Adam(model.parameters(), lr=0.001)
     optimizer_SGD = torch.optim.SGD(model.parameters(), lr=0.001, momentum = 0.9)
-    
+    '''
     #scheduler 
     #step size relates to number of epoch
     #in the paper they say they step every 1000 iterations
+    '''
     scheduler_adam = torch.optim.lr_scheduler.StepLR(optimizer_adam, step_size=5, gamma=0.1)
     scheduler_SGD = torch.optim.lr_scheduler.StepLR(optimizer_SGD, step_size=5, gamma=0.1)
-
+    '''
     #loss function
     loss_func_mse = nn.MSELoss()
 
@@ -58,15 +59,21 @@ def main():
     for epoch in range(args.epochs):
         num_batches = len(train_dataset_loader)
         for batch_idx, data in enumerate(train_dataset_loader):
-            step = epoch*num_batches + batch_idx
+            pdb.set_trace()
+            current_step = epoch*num_batches + batch_idx
             #reset optimizer
+            '''
             optimizer_adam.zero_grad()
+            '''
             #set model to train
+            '''
             model.train()
+            '''
             #get data from dataloader
             image = data['image']
             ground_truth = data['ground_truth']
             #run through model and get prediction
+            '''
             prediction = model(image)
 
             #calculate loss
@@ -77,11 +84,12 @@ def main():
             optimizer_adam.step()
 
 
-            if step % args.log_every ==0:
+            if current_step % args.log_every ==0:
                 print("Epoch: {}, Batch {}/{} has loss {}".format(epoch, batch_idx, num_batches, loss))
 
         #step scheduler, steps based on set step size
         scheduler_adam.setp()
+        '''
 
 
 
