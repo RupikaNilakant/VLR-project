@@ -7,9 +7,12 @@ import torch.nn.functional as F
 from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 from deepfake_data import deepfakeDataset
+
 from pytorch_model import MesoNet4
 from tensorboard import SummaryWriter
 from classifers import Meso4
+
+
 
 #To DO: import model
 '''
@@ -34,9 +37,10 @@ def main():
     #load dataset
     train_dataset = deepfakeDataset(split='train',image_dir=)
     test_dataset = deepfakeDataset(split='valid', image_dir=None)
+
     train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=args.batch-size, shuffle=True)
     test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch-size, shuffle=True)
-
+    
     #define model
     #TO DO import model
     model = Meso4().cuda()
@@ -45,9 +49,9 @@ def main():
     #I have multiple options we can try 
     
     optimizer_adam = torch.optim.Adam(model.parameters(), lr=0.001)
-    '''
-    optimizer_SGD = torch.optim.SGD(model.parameters(), lr=0.001, momentum = 0.9)
-    '''
+    #optimizer_SGD = torch.optim.SGD(model.parameters(), lr=0.001, momentum = 0.9)
+    
+
     #scheduler 
     #step size relates to number of epoch
     #in the paper they say they step every 1000 iterations
@@ -75,7 +79,9 @@ def main():
             
             #get data from dataloader
             image = data['image'].cuda()
-            ground_truth = data['ground_truth'].view((len(data['ground_truth']),1)).float().cuda()
+            ground_truth = data['ground_truth'].view((len(data['ground_truth']),1)).float()
+            ground_truth = ground_truth.cuda()
+
             #run through model and get prediction
             
             prediction = model(image)
@@ -90,7 +96,7 @@ def main():
 
             if current_step % args.log_every ==0:
                 print("Epoch: {}, Batch {}/{} has loss {}".format(epoch, batch_idx, num_batches, loss))
-
+        '''
         #step scheduler, steps based on set step size
         scheduler_adam.setp()
         '''
