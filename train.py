@@ -8,14 +8,14 @@ from torchvision import datasets, transforms
 
 from deepfake_data import deepfakeDataset
 
-
+import network
 from torch.utils.tensorboard import SummaryWriter
 from classifiers import Meso4
-
+import os
 
 
 #To DO: import model
-'''
+
 def validate(model, test_dataset, iwriter):
     model.eval()
     for batch_idx, data in enumerate(test_dataset_loader):
@@ -25,7 +25,7 @@ def validate(model, test_dataset, iwriter):
 
         #calc loss
         #calc accuracy
-'''
+
 
 
 
@@ -33,7 +33,7 @@ def main():
 
     #set up tensorboard
     writer = SummaryWriter()
-
+    output_dir = '/home/ubuntu/VLR-16824/VLR-project/saved_model'
     #load dataset
     #train_dataset = deepfakeDataset(split='train',image_dir=None)
     #test_dataset = deepfakeDataset(split='valid', image_dir=None)
@@ -101,13 +101,12 @@ def main():
 
             if current_step % args.log_every ==0:
                 print("Epoch: {}, Batch {}/{} has loss {}".format(epoch, batch_idx, num_batches, loss))
-        '''
-        #step scheduler, steps based on set step size
-        scheduler_adam.setp()
-        '''
-        #To Do save model
 
-
+        if epochs % 10 and current_step > 0:
+            save_name = os.path.join(
+            output_dir, '{}_{}.e10'.format(epoch,current_step))
+            torch.save(model.state_dict(), save_name)
+            print('Saved model to {}'.format(save_name))
 
 
 

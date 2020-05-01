@@ -64,7 +64,7 @@ class Meso4(nn.Module):
 		x = self.nonlinear(x)
 		x = self.batchNorm2(x)
 		x = self.pool1(x)
-		pdb.set_trace()
+		#pdb.set_trace()
 
 		x = self.conv3(x)
 		x = self.nonlinear(x)
