@@ -5,27 +5,48 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import datasets, transforms
-
 from deepfake_data import deepfakeDataset
-
-
 from torch.utils.tensorboard import SummaryWriter
-from classifers import Meso4
+
+from classifiers import Meso4
 
 
 
 #To DO: import model
-'''
-def validate(model, test_dataset, writer):
+
+def validate(model, test_dataset_loader, writer,loss_func, epoch):
+    num_batches = len(test_dataset_loader)
+    correct = 0
+    count = 0
+    total_loss = 0
     model.eval()
     for batch_idx, data in enumerate(test_dataset_loader):
-        image = data['image']
-        ground_truth = data['ground_truth']
+        image = data['image'].cuda()
+        ground_truth = data['ground_truth'].view((len(data['ground_truth']),1)).float()
+        ground_truth = ground_truth.cuda()
+
         prediction = model(image)
 
         #calc loss
+        loss = loss_func(prediction,ground_truth)
+        total_loss +=loss.item()
+
         #calc accuracy
-'''
+        for i in range(prediction.shape[0]):
+            count+=1
+            if (prediction[i]<0.2 and ground_truth[i]==0):
+                correct+=1
+            elif(prediction[i]>=0.8 and ground_truth[i]==1):
+                correct+=1
+    avg_loss = total_loss/count   
+    print("Epoch: {}, Validation has loss {}".format(epoch, avg_loss))
+
+    accuracy = correct/count
+    #send to tensorboard
+    writer.add_scalar('validation accuracy', accuracy,epoch)
+    print("Epoch: {}, Validation accuracy is {}".format(epoch, accuracy))
+
+
 
 
 
@@ -35,16 +56,16 @@ def main():
     writer = SummaryWriter()
 
     #load dataset
-    #train_dataset = deepfakeDataset(split='train',image_dir=None)
-    #test_dataset = deepfakeDataset(split='valid', image_dir=None)
-    train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
-    test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
+    train_dataset = deepfakeDataset(split='train',image_dir=None)
+    test_dataset = deepfakeDataset(split='valid', image_dir=None)
+    #train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
+    #test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
 
-    #train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
-    #test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
+    train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
+    test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
 
-    train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=args.batch-size, shuffle=True)
-    test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch-size, shuffle=True)
+    #train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=args.batch-size, shuffle=True)
+    #test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch-size, shuffle=True)
     
     #define model
     #TO DO import model
@@ -72,7 +93,7 @@ def main():
     for epoch in range(args.epochs):
         num_batches = len(train_dataset_loader)
         for batch_idx, data in enumerate(train_dataset_loader):
-            pdb.set_trace()
+            #pdb.set_trace()
             current_step = epoch*num_batches + batch_idx
             #reset optimizer
             
@@ -94,13 +115,18 @@ def main():
             #calculate loss
             loss = loss_func_mse(prediction,ground_truth)
             #backprop
-            loss.backwards()
+            loss.backward()
             #step optimizer
             optimizer_adam.step()
 
+            #write to tensorboard
+            writer.add_scalar('trainning loss', loss.item(),current_step)
 
+            #print
             if current_step % args.log_every ==0:
                 print("Epoch: {}, Batch {}/{} has loss {}".format(epoch, batch_idx, num_batches, loss))
+        
+        validate(model, test_dataset_loader, writer,loss_func_mse, epoch)
         '''
         #step scheduler, steps based on set step size
         scheduler_adam.setp()
@@ -120,7 +146,7 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description='deepfake detection')
     # config for dataset
-    parser.add_argument('--batch-size', type=int, default=1, metavar='N',
+    parser.add_argument('--batchsize', type=int, default=1, metavar='N',
                         help='input batch size for training (default: 64)')
     parser.add_argument('--test-batch-size', type=int, default=1, metavar='N',
                         help='input batch size for testing (default: 1000)')
