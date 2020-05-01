@@ -8,9 +8,11 @@ from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 from deepfake_data import deepfakeDataset
 from pytorch_model import MesoNet4
+from tensorboard import SummaryWriter
+from classifers import Meso4
 
 #To DO: import model
-
+'''
 def validate(model, test_dataset, writer):
     model.eval()
     for batch_idx, data in enumerate(test_dataset_loader):
@@ -20,29 +22,30 @@ def validate(model, test_dataset, writer):
 
         #calc loss
         #calc accuracy
-
+'''
 
 
 
 def main():
 
     #set up tensorboard
-    #writer = SummaryWriter()
+    writer = SummaryWriter()
 
     #load dataset
-    train_dataset = deepfakeDataset(split='train',image_dir=None)
+    train_dataset = deepfakeDataset(split='train',image_dir=)
     test_dataset = deepfakeDataset(split='valid', image_dir=None)
-    train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
-    test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
+    train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=args.batch-size, shuffle=True)
+    test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch-size, shuffle=True)
 
     #define model
     #TO DO import model
-    model = MesoNet4()
+    model = Meso4().cuda()
 
     #optimizer
     #I have multiple options we can try 
-    '''
+    
     optimizer_adam = torch.optim.Adam(model.parameters(), lr=0.001)
+    '''
     optimizer_SGD = torch.optim.SGD(model.parameters(), lr=0.001, momentum = 0.9)
     '''
     #scheduler 
@@ -63,20 +66,20 @@ def main():
             pdb.set_trace()
             current_step = epoch*num_batches + batch_idx
             #reset optimizer
-            '''
+            
             optimizer_adam.zero_grad()
-            '''
+            
             #set model to train
             
             model.train()
             
             #get data from dataloader
-            image = data['image']
-            ground_truth = data['ground_truth']
+            image = data['image'].cuda()
+            ground_truth = data['ground_truth'].view((len(data['ground_truth']),1)).float().cuda()
             #run through model and get prediction
             
             prediction = model(image)
-            '''
+            
             #calculate loss
             loss = loss_func_mse(prediction,ground_truth)
             #backprop
