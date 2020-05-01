@@ -38,14 +38,16 @@ class deepfakeDataset(Dataset):
             df_path = os.path.join(self.image_dir,"df")
             for (root,dirs,files) in os.walk(df_path):
                 for file_ in files:
-                    self.image_list.append(df_path+'/'+file_)
-                    self.gt_list.append('df')
+                    if file_.endswith('.jpg'):
+                        self.image_list.append(df_path+'/'+file_)
+                        self.gt_list.append(1)
 
             real_path = os.path.join(self.image_dir,'real')
             for (root,dirs,files) in os.walk(real_path):
                 for file_ in files:
-                    self.image_list.append(real_path+'/'+file_)
-                    self.gt_list.append('real')
+                    if file_.endswith('.jpg'):
+                        self.image_list.append(real_path+'/'+file_)
+                        self.gt_list.append(0)
             
             #pdb.set_trace()
 
@@ -63,13 +65,13 @@ class deepfakeDataset(Dataset):
             for (root,dirs,files) in os.walk(df_path):
                 for file_ in files:
                     self.image_list.append(df_path+'/'+file_)
-                    self.gt_list.append('df')
+                    self.gt_list.append(1)
 
             real_path = os.path.join(self.image_dir,'real')
             for (root,dirs,files) in os.walk(real_path):
                 for file_ in files:
                     self.image_list.append(real_path+'/'+file_)
-                    self.gt_list.append('real')
+                    self.gt_list.append(0)
 
             #TO DO create self.image_list []
         elif split =='test':
