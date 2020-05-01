@@ -10,13 +10,13 @@ from deepfake_data import deepfakeDataset
 
 
 from torch.utils.tensorboard import SummaryWriter
-from classifers import Meso4
+from classifiers import Meso4
 
 
 
 #To DO: import model
 '''
-def validate(model, test_dataset, writer):
+def validate(model, test_dataset, iwriter):
     model.eval()
     for batch_idx, data in enumerate(test_dataset_loader):
         image = data['image']
@@ -43,8 +43,8 @@ def main():
     #train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
     #test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
 
-    train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=args.batch-size, shuffle=True)
-    test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch-size, shuffle=True)
+    train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=args.batchsize, shuffle=True)
+    test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batchsize, shuffle=True)
     
     #define model
     #TO DO import model
@@ -72,7 +72,7 @@ def main():
     for epoch in range(args.epochs):
         num_batches = len(train_dataset_loader)
         for batch_idx, data in enumerate(train_dataset_loader):
-            pdb.set_trace()
+            #pdb.set_trace()
             current_step = epoch*num_batches + batch_idx
             #reset optimizer
             
@@ -94,7 +94,7 @@ def main():
             #calculate loss
             loss = loss_func_mse(prediction,ground_truth)
             #backprop
-            loss.backwards()
+            loss.backward()
             #step optimizer
             optimizer_adam.step()
 
@@ -120,7 +120,7 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description='deepfake detection')
     # config for dataset
-    parser.add_argument('--batch-size', type=int, default=1, metavar='N',
+    parser.add_argument('--batchsize', type=int, default=1, metavar='N',
                         help='input batch size for training (default: 64)')
     parser.add_argument('--test-batch-size', type=int, default=1, metavar='N',
                         help='input batch size for testing (default: 1000)')
