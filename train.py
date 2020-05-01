@@ -32,8 +32,8 @@ def main():
     #load dataset
     train_dataset = deepfakeDataset(split='train',image_dir=None)
     test_dataset = deepfakeDataset(split='valid', image_dir=None)
-    train_dataset_loader = torch.utils.data.DataLoader(train_dataset,args.batch_size, shuffle=True)
-    test_dataset_loader = torch.utils.data.DataLoader(test_dataset, args.batch_size, shuffle=True)
+    train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
+    test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
 
     #define model
     #TO DO import model
