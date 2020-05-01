@@ -5,11 +5,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import datasets, transforms
-import matplotlib.pyplot as plt
+
 from deepfake_data import deepfakeDataset
 
-from pytorch_model import MesoNet4
-from tensorboard import SummaryWriter
+
+from torch.utils.tensorboard import SummaryWriter
 from classifers import Meso4
 
 
@@ -35,8 +35,8 @@ def main():
     writer = SummaryWriter()
 
     #load dataset
-    train_dataset = deepfakeDataset(split='train',image_dir=)
-    test_dataset = deepfakeDataset(split='valid', image_dir=None)
+    train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
+    test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
 
     train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=args.batch-size, shuffle=True)
     test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch-size, shuffle=True)
