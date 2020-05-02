@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import datasets, transforms
 from deepfake_data import deepfakeDataset
-import network
+#import network
 from torch.utils.tensorboard import SummaryWriter
 from classifiers import Meso4
 import os
@@ -130,7 +130,7 @@ def main():
         scheduler_adam.setp()
         '''
         #To Do save model
-        if epochs % 10 and current_step > 0:
+        if epoch % 10 and current_step > 0:
             save_name = os.path.join(
             output_dir, '{}_{}.e10'.format(epoch,current_step))
             torch.save(model.state_dict(), save_name)
