@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import datasets
 from torchvision import transforms as T
-import matplotlib.pyplot as plt
+
 from PIL import Image
 from torch.utils.data import Dataset
 import imageio
