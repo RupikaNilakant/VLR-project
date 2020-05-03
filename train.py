@@ -51,15 +51,15 @@ def main():
 
     #set up tensorboard
     writer = SummaryWriter()
-    output_dir = '/home/ubuntu/VLR-16824/VLR-project/saved_model'
+    output_dir = 'saved_model'
     #load dataset
     train_dataset = deepfakeDataset(split='train',image_dir=None)
     test_dataset = deepfakeDataset(split='valid', image_dir=None)
     #train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
     #test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
 
-    train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
-    test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
+    #train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
+    #test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
 
     train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=args.batchsize, shuffle=True)
     test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batchsize, shuffle=True)
@@ -79,10 +79,10 @@ def main():
     #scheduler 
     #step size relates to number of epoch
     #in the paper they say they step every 1000 iterations
-    '''
+
     scheduler_adam = torch.optim.lr_scheduler.StepLR(optimizer_adam, step_size=5, gamma=0.1)
-    scheduler_SGD = torch.optim.lr_scheduler.StepLR(optimizer_SGD, step_size=5, gamma=0.1)
-    '''
+    #scheduler_SGD = torch.optim.lr_scheduler.StepLR(optimizer_SGD, step_size=5, gamma=0.1)
+    
     #loss function
     loss_func_mse = nn.MSELoss()
 
@@ -125,10 +125,10 @@ def main():
                 print("Epoch: {}, Batch {}/{} has loss {}".format(epoch, batch_idx, num_batches, loss))
         
         validate(model, test_dataset_loader, writer,loss_func_mse, epoch)
-        '''
+    
         #step scheduler, steps based on set step size
-        scheduler_adam.setp()
-        '''
+        scheduler_adam.step()
+
         #To Do save model
         if epoch % 10 and current_step > 0:
             save_name = os.path.join(
