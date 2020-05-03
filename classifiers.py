@@ -14,7 +14,7 @@ class Meso4(nn.Module):
 
 		#what about input dimension?
 		#keep the image 256
-		self.conv1 = nn.Conv2d(c_dim,8,3,stride=1,padding=1)
+		self.conv1 = nn.Conv2d(c_dim,8,3,stride=1,padding=2)
 		
 		self.conv2 = nn.Conv2d(8,8,5,stride=1,padding=2)
 		
@@ -94,4 +94,23 @@ class Meso4(nn.Module):
 
 
 class MesoInception4(nn.Module):
-	pass
+    def __init__(self, c_dim=3):
+        super().__init__()
+    
+        self.
+        def InceptionLayer (self, a,b,c,d):
+            def func(x):
+            x1 = Conv2D(a, (1, 1), padding='same', activation='relu')(x)
+            
+            x2 = Conv2D(b, (1, 1), padding='same', activation='relu')(x)
+            x2 = Conv2D(b, (3, 3), padding='same', activation='relu')(x2)
+            
+            x3 = Conv2D(c, (1, 1), padding='same', activation='relu')(x)
+            x3 = Conv2D(c, (3, 3), dilation_rate = 2, strides = 1, padding='same', activation='relu')(x3)
+            
+            x4 = Conv2D(d, (1, 1), padding='same', activation='relu')(x)
+            x4 = Conv2D(d, (3, 3), dilation_rate = 3, strides = 1, padding='same', activation='relu')(x4)
+
+            y = Concatenate(axis = -1)([x1, x2, x3, x4])
+            
+            return y
