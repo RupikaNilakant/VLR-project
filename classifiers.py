@@ -93,20 +93,19 @@ class Meso4(nn.Module):
 
 
 class Inception(nn.Module):
-	def __init__(self,a,b,c,d):
+	def __init__(self,a,b,c,d,c_dim):
 		super(Inception,self).__init__()
 
-		self.conva = nn.Conv2d(inp_dim,a,1,padding=2)
-		self.convb1 = nn.Conv2d(inp_dim,b,1,padding=2)
-		self.convb3 = nn.Conv2d(inp_dim,b,3,padding=2)
-		self.convc1 = nn.Conv2d(inp_dim,c,1,padding=2)
-		self.convc3 = nn.Conv2d(inp_dim,c,3,padding=2,dilation=2)
-		self.convd1 = nn.Conv2d(inp_dim,d,1,padding=2)
-		self.convd3 = nn.Conv2d(inp_dim,d,3,padding=2,dilation=3)
+		self.conva = nn.Conv2d(c_dim,a,1,padding=0)
+		self.convb1 = nn.Conv2d(c_dim,b,1,padding=0)
+		self.convb3 = nn.Conv2d(b,b,3,padding=1)
+		self.convc1 = nn.Conv2d(c_dim,c,1,padding=0)
+		self.convc3 = nn.Conv2d(c,c,3,padding=2,dilation=2)
+		self.convd1 = nn.Conv2d(c_dim,d,1,padding=0)
+		self.convd3 = nn.Conv2d(d,d,3,padding=3,dilation=3)
 		self.nonlinear = lambda x:nn.functional.relu(x)		
 
 	def forward(self,x):
-
 		x1 = self.conva(x)
 		x1 = self.nonlinear(x1)
 
@@ -130,26 +129,30 @@ class Inception(nn.Module):
 		return y
 
 class MesoInception4(nn.Module):
-    def __init__(self, c_dim=3):
-        super(MesoInception4,self).__init__()
-    	
-    	self.batchNorm1 = nn.BatchNorm2d(8)
-    	self.pool1 = nn.MaxPool2d(2, 2)
+	def __init__(self, c_dim=3):
+		super(MesoInception4,self).__init__()
+		
+		self.batchNorm1 = nn.BatchNorm2d(11)
+		self.batchNorm2 = nn.BatchNorm2d(12)
+		self.batchNorm3 = nn.BatchNorm2d(16)
+		self.batchNorm4 = nn.BatchNorm2d(16)
+		self.pool1 = nn.MaxPool2d(2, 2)
 		self.pool2 = nn.MaxPool2d(4, 4)
-		self.flat_dim = 
+		self.flat_dim = 1024
 		self.leakyrelu = nn.LeakyReLU(0.1)
 		self.dropout = nn.Dropout(p=0.5)
 		self.sigmoid = lambda x:nn.functional.sigmoid(x)
 		self.fc1 = nn.Linear(self.flat_dim,16)
 		self.fc2 = nn.Linear(16,1)
-
-		self.conv = nn.Conv2d(dim,16,5,padding=2)
+		
+		self.conv3 = nn.Conv2d(12,16,5,padding=2)
+		self.conv4 = nn.Conv2d(16,16,5,padding=2)
 		self.nonlinear = lambda x:nn.functional.relu(x)	
-		self.incept1 = Inception(1,4,4,2)
-		self.incept2 = Inception(2,4,4,2)
+
+		self.incept1 = Inception(1,4,4,2,3)
+		self.incept2 = Inception(2,4,4,2,11)
 
 	def forward(self,x):
-
 		N = x.size(0)
 
 		x = self.incept1(x)
@@ -157,17 +160,17 @@ class MesoInception4(nn.Module):
 		x = self.pool1(x)
 
 		x = self.incept2(x)
-		x = self.batchNorm1(x)
+		x = self.batchNorm2(x)
 		x = self.pool1(x)
 
-		x = self.conv(x)
+		x = self.conv3(x)
 		x = self.nonlinear(x)
-		x = self.batchNorm1(x)
+		x = self.batchNorm3(x)
 		x = self.pool1(x)
 
-		x = self.conv(x)
+		x = self.conv4(x)
 		x = self.nonlinear(x)
-		x = self.batchNorm1(x)
+		x = self.batchNorm4(x)
 		x = self.pool2(x)
 
 		x = x.view(N,self.flat_dim)
