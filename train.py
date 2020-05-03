@@ -41,7 +41,7 @@ def validate(model, test_dataset_loader, writer,loss_func, epoch):
 
     accuracy = correct/count
     #send to tensorboard
-    writer.add_scalar('validation accuracy', accuracy,epoch)
+    writer.add_scalar('validation/accuracy', accuracy,epoch)
     print("Epoch: {}, Validation accuracy is {}".format(epoch, accuracy))
 
 
@@ -53,10 +53,10 @@ def main():
     writer = SummaryWriter()
     output_dir = 'saved_model'
     #load dataset
-    train_dataset = deepfakeDataset(split='train',image_dir=None)
-    test_dataset = deepfakeDataset(split='valid', image_dir=None)
-    #train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
-    #test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
+    #train_dataset = deepfakeDataset(split='train',image_dir=None)
+    #test_dataset = deepfakeDataset(split='valid', image_dir=None)
+    train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
+    test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
 
     #train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
     #test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
@@ -118,7 +118,7 @@ def main():
             optimizer_adam.step()
 
             #write to tensorboard
-            writer.add_scalar('trainning loss', loss.item(),current_step)
+            writer.add_scalar('train/loss', loss.item(),current_step)
 
             #print
             if current_step % args.log_every ==0:
