@@ -50,13 +50,15 @@ def main():
 
     #set up tensorboard
     writer = SummaryWriter()
-    output_dir = 'saved_model'
     #load dataset
-    train_dataset = deepfakeDataset(split='train',image_dir=None)
-    test_dataset = deepfakeDataset(split='valid', image_dir=None)
-    #train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
-    #test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
-
+    if args.person=='Aubrey':
+        train_dataset = deepfakeDataset(split='train',image_dir=None)
+        test_dataset = deepfakeDataset(split='valid', image_dir=None)
+        output_dir = 'saved_model'
+    if args.person=='Rupika':
+        train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
+        test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
+        output_dir = '/home/ubuntu/VLR-16824/saved_model'
     #train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
     #test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
 
@@ -163,6 +165,8 @@ def parse_args():
                         help='how many batches to wait before logging training status')
     parser.add_argument('--val_every', type=int, default=100, metavar='N',
                         help='how many batches to wait before evaluating model')
+    parser.add_argument('--person',
+                        help='who is running the code')
 
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
