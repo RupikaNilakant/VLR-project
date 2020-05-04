@@ -1,6 +1,5 @@
 import argparse
 import pdb
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -8,7 +7,7 @@ from torchvision import datasets, transforms
 from deepfake_data import deepfakeDataset
 #import network
 from torch.utils.tensorboard import SummaryWriter
-from classifiers import Meso4
+from classifiers import Meso4, MesoInception4
 import os
 
 
@@ -53,10 +52,10 @@ def main():
     writer = SummaryWriter()
     output_dir = 'saved_model'
     #load dataset
-    #train_dataset = deepfakeDataset(split='train',image_dir=None)
-    #test_dataset = deepfakeDataset(split='valid', image_dir=None)
-    train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
-    test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
+    train_dataset = deepfakeDataset(split='train',image_dir=None)
+    test_dataset = deepfakeDataset(split='valid', image_dir=None)
+    #train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
+    #test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
 
     #train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
     #test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
@@ -68,6 +67,7 @@ def main():
     #define model
     #TO DO import model
     model = Meso4().cuda()
+    #model = MesoInception4().cuda()
 
     #optimizer
     #I have multiple options we can try 
@@ -80,11 +80,12 @@ def main():
     #step size relates to number of epoch
     #in the paper they say they step every 1000 iterations
 
-    scheduler_adam = torch.optim.lr_scheduler.StepLR(optimizer_adam, step_size=5, gamma=0.1)
+    scheduler_adam = torch.optim.lr_scheduler.StepLR(optimizer_adam, step_size=20, gamma=0.1)
     #scheduler_SGD = torch.optim.lr_scheduler.StepLR(optimizer_SGD, step_size=5, gamma=0.1)
     
     #loss function
-    loss_func_mse = nn.MSELoss()
+    #loss_func_mse = nn.MSELoss()
+    loss_func_bce = nn.BCELoss()
 
     #train
     step = 0
@@ -111,7 +112,8 @@ def main():
             prediction = model(image)
             
             #calculate loss
-            loss = loss_func_mse(prediction,ground_truth)
+            #loss = loss_func_mse(prediction,ground_truth)
+            loss = loss_func_bce(prediction,ground_truth)
             #backprop
             loss.backward()
             #step optimizer
