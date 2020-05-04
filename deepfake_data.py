@@ -24,9 +24,11 @@ class deepfakeDataset(Dataset):
             self.base_dir = image_dir
 
         if split =='train':
-            #To Do add more transforms
             #pdb.set_trace()
             self.transforms = T.Compose([T.Resize((256,256)),
+                                        T.RandomHorizontalFlip(p=0.5),
+                                        T.RandomRotation((-15,15)),
+                                        T.ColorJitter(brightness=0.25, hue=0.1),
                                         T.ToTensor()])
             self.image_dir = os.path.join(self.base_dir,'train:test')
 
