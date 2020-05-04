@@ -73,6 +73,8 @@ class Meso4(nn.Module):
 		x = self.conv4(x)
 		x =self.nonlinear(x)
 		x = self.batchNorm4(x)
+
+		y= self.pool2(x)
 		x= self.pool2(x)
 
 		x = x.view(N,self.flat_dim)
@@ -89,7 +91,7 @@ class Meso4(nn.Module):
 
 		x = self.sigmoid(x)
 
-		return x
+		return x,y
 
 
 class Inception(nn.Module):
@@ -171,7 +173,10 @@ class MesoInception4(nn.Module):
 		x = self.conv4(x)
 		x = self.nonlinear(x)
 		x = self.batchNorm4(x)
+
+		y = self.pool2(x)
 		x = self.pool2(x)
+		
 
 		x = x.view(N,self.flat_dim)
 
@@ -182,7 +187,7 @@ class MesoInception4(nn.Module):
 		x = self.fc2(x)
 		x = self.sigmoid(x)
 
-		return x
+		return x,y
 
 
 

@@ -9,6 +9,7 @@ from deepfake_data import deepfakeDataset
 from torch.utils.tensorboard import SummaryWriter
 from classifiers import Meso4, MesoInception4
 import os
+import matplotlib.pyplot as plt
 
 
 def validate(model, test_dataset_loader, writer,loss_func, epoch):
@@ -22,7 +23,7 @@ def validate(model, test_dataset_loader, writer,loss_func, epoch):
         ground_truth = data['ground_truth'].view((len(data['ground_truth']),1)).float()
         ground_truth = ground_truth.cuda()
 
-        prediction = model(image)
+        prediction, heatmapout = model(image)
 
         #calc loss
         loss = loss_func(prediction,ground_truth)
@@ -43,6 +44,18 @@ def validate(model, test_dataset_loader, writer,loss_func, epoch):
     writer.add_scalar('validation/accuracy', accuracy,epoch)
     print("Epoch: {}, Validation accuracy is {}".format(epoch, accuracy))
 
+    #makeheatmap and write to tensorboard
+    index = 0
+    heatim = heatmapout[index][0].data.cpu()
+    heatmin = heatim.min()
+    heatmax = heatim.max()
+    heat_t = ((heatim-heatmin)*255)/(heatmax-heatmin)
+    heatim_n = heat_t.numpy()
+    fig = plt.figure(1)
+    plt.imshow(heatim_n, cmap='jet')
+    #heat_map_img = plt.imshow(heatim_n)
+    writer.add_figure('validation/heatmap'+str(epoch),fig)
+
 
 
 
@@ -58,7 +71,7 @@ def main():
     if args.person=='Rupika':
         train_dataset = deepfakeDataset(split='train',image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
         test_dataset = deepfakeDataset(split='valid', image_dir='/home/ubuntu/VLR-16824/VLR-project/deepfake_database/deepfake_database')
-        output_dir = '/home/ubuntu/VLR-16824/saved_model'
+        output_dir = '/home/ubuntu/VLR-16824/VLR-project/saved_model'
     #train_dataset_loader = torch.utils.data.DataLoader(train_dataset,batch_size=5, shuffle=True)
     #test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=5, shuffle=True)
 
@@ -74,7 +87,7 @@ def main():
     #optimizer
     #I have multiple options we can try 
     
-    optimizer_adam = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer_adam = torch.optim.Adam(model.parameters(), lr=0.01)
     #optimizer_SGD = torch.optim.SGD(model.parameters(), lr=0.001, momentum = 0.9)
     
 
@@ -82,7 +95,7 @@ def main():
     #step size relates to number of epoch
     #in the paper they say they step every 1000 iterations
 
-    scheduler_adam = torch.optim.lr_scheduler.StepLR(optimizer_adam, step_size=20, gamma=0.1)
+    scheduler_adam = torch.optim.lr_scheduler.StepLR(optimizer_adam, step_size=15, gamma=0.1)
     #scheduler_SGD = torch.optim.lr_scheduler.StepLR(optimizer_SGD, step_size=5, gamma=0.1)
     
     #loss function
@@ -111,7 +124,7 @@ def main():
 
             #run through model and get prediction
             
-            prediction = model(image)
+            prediction, heatmapout = model(image)
             
             #calculate loss
             #loss = loss_func_mse(prediction,ground_truth)
@@ -120,6 +133,7 @@ def main():
             loss.backward()
             #step optimizer
             optimizer_adam.step()
+            
 
             #write to tensorboard
             writer.add_scalar('train/loss', loss.item(),current_step)
@@ -128,7 +142,7 @@ def main():
             if current_step % args.log_every ==0:
                 print("Epoch: {}, Batch {}/{} has loss {}".format(epoch, batch_idx, num_batches, loss))
         
-        validate(model, test_dataset_loader, writer,loss_func_mse, epoch)
+        validate(model, test_dataset_loader, writer,loss_func_bce, epoch)
     
         #step scheduler, steps based on set step size
         scheduler_adam.step()
@@ -139,6 +153,21 @@ def main():
             output_dir, '{}_{}.e10'.format(epoch,current_step))
             torch.save(model.state_dict(), save_name)
             print('Saved model to {}'.format(save_name))
+
+            #makeheatmap and write to tensorboard
+            index = 0
+            heatim = heatmapout[index][0].data.cpu()
+            heatmin = heatim.min()
+            heatmax = heatim.max()
+            heat_t = ((heatim-heatmin)*255)/(heatmax-heatmin)
+            heatim_n = heat_t.numpy()
+            fig = plt.figure(1)
+            plt.imshow(heatim_n, cmap='jet')
+            #heat_map_img = plt.imshow(heatim_n)
+            writer.add_figure('train/heatmap'+str(epoch),fig)
+
+
+
 
 
 
