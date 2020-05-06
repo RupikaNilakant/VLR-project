@@ -87,7 +87,7 @@ def main():
     #optimizer
     #I have multiple options we can try 
     
-    optimizer_adam = torch.optim.Adam(model.parameters(), lr=0.01)
+    optimizer_adam = torch.optim.Adam(model.parameters(), lr=0.001)
     #optimizer_SGD = torch.optim.SGD(model.parameters(), lr=0.001, momentum = 0.9)
     
 
@@ -125,6 +125,7 @@ def main():
             #run through model and get prediction
             
             prediction, heatmapout = model(image)
+            pdb.set_trace()
             
             #calculate loss
             #loss = loss_func_mse(prediction,ground_truth)
