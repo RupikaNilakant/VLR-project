@@ -77,6 +77,30 @@ class deepfakeDataset(Dataset):
                         self.image_list.append(real_path+'/'+file_)
                         self.gt_list.append(0)
 
+        elif split=='test':
+            self.transforms = T.Compose([T.Resize((256,256)),
+                                        T.ToTensor()])
+            self.image_dir = os.path.join(self.base_dir)
+
+            #list that holds full path to every image
+            self.image_list = []
+            #holds if real or fake
+            self.gt_list = []
+
+            df_path = os.path.join(self.image_dir,"training_fake")
+            for (root,dirs,files) in os.walk(df_path):
+                for file_ in files:
+                    if file_.endswith('.jpg'):
+                        self.image_list.append(df_path+'/'+file_)
+                        self.gt_list.append(1)
+
+            real_path = os.path.join(self.image_dir,'training_real')
+            for (root,dirs,files) in os.walk(real_path):
+                for file_ in files:
+                    if file_.endswith('.jpg'):
+                        self.image_list.append(real_path+'/'+file_)
+                        self.gt_list.append(0)
+
             #TO DO create self.image_list []
         elif split =='test':
             print('inference not implemented')
