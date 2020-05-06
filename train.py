@@ -54,8 +54,25 @@ def validate(model, test_dataset_loader, writer,loss_func, epoch):
     fig = plt.figure(1)
     plt.imshow(heatim_n, cmap='jet')
     #heat_map_img = plt.imshow(heatim_n)
-    writer.add_figure('validation/heatmap'+str(epoch),fig)
+    #writer.add_figure('validation/heatmap'+str(epoch),fig)
+    pred=prediction.data.cpu().numpy()
+    gt=ground_truth.data.cpu().numpy()
+    print("plotting validation heatmaps")
+    if (pred[0]>0.5):
+            writer.add_figure('validate/heatmap'+str(epoch)+'_deepFake_pred',fig)
+    else:
+            writer.add_figure('validate/heatmap'+str(epoch)+'_real_pred',fig)
 
+    if (gt[0]==1):
+            writer.add_figure('validate/heatmap'+str(epoch)+'_deepFake_gt',fig)
+    else:
+            writer.add_figure('validate/heatmap'+str(epoch)+'_real_gt',fig)
+
+    img = image.data[0].cpu().numpy()
+    img_min = img.min()
+    img_max = img.max()
+    img_norm = (img-img_min)/(img_max-img_min)
+    writer.add_image('validate/image'+str(epoch),img_norm)
 
 
 
@@ -81,8 +98,8 @@ def main():
     
     #define model
     #TO DO import model
-    model = Meso4().cuda()
-    #model = MesoInception4().cuda()
+    #model = Meso4().cuda()
+    model = MesoInception4().cuda()
 
     #optimizer
     #I have multiple options we can try 
@@ -165,9 +182,24 @@ def main():
             fig = plt.figure(1)
             plt.imshow(heatim_n, cmap='jet')
             #heat_map_img = plt.imshow(heatim_n)
-            writer.add_figure('train/heatmap'+str(epoch),fig)
-
-
+            pred=prediction.data.cpu().numpy()
+            gt=ground_truth.data.cpu().numpy()
+            print("plotting train heatmaps")
+            if (pred[0]>0.5):
+                writer.add_figure('train/heatmap'+str(epoch)+'_deepFake_pred',fig)
+            else:
+                writer.add_figure('train/heatmap'+str(epoch)+'_real_pred',fig)
+            
+            if (gt[0]==1):
+                writer.add_figure('train/heatmap'+str(epoch)+'_deepFake_gt',fig)
+            else:
+                writer.add_figure('train/heatmap'+str(epoch)+'_real_gt',fig)
+            
+            img = image.data[0].cpu().numpy()
+            img_min = img.min()
+            img_max = img.max()
+            img_norm = (img-img_min)/(img_max-img_min)
+            writer.add_image('train/image'+str(epoch),img_norm)
 
 
 
