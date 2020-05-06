@@ -27,6 +27,8 @@ def main():
     num_batches = len(test_dataset_loader)
     correct = 0
     count = 0
+    real_count = 0
+    df_count = 0
     total_loss = 0
     model.eval()
     for batch_idx, data in enumerate(test_dataset_loader):
@@ -41,8 +43,10 @@ def main():
             count+=1
             if (prediction[i]<0.2 and ground_truth[i]==0):
                 correct+=1
+                real_count+=1
             elif(prediction[i]>=0.8 and ground_truth[i]==1):
                 correct+=1
+                df_count+=1
 
     accuracy = correct/count
     #send to tensorboard
