@@ -17,10 +17,10 @@ def main():
         test_dataset = deepfakeDataset(split='test', image_dir='/home/aubs/VLR-project2/real-and-fake-face-detection')
         test_dataset_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batchsize, shuffle=True)
         model_path = '/home/aubs/VLR-project2/VLR-project/saved_model/Aubrey_7/44_10124.e10' #inception
-        model_path = '/home/aubs/VLR-project2/VLR-project/saved_model/Aubrey_6/44_7424.e10' #regular Meso
+        #model_path = '/home/aubs/VLR-project2/VLR-project/saved_model/Meso4_final/44_7424.e10' #regular Meso
 
     #load model
-    model = Meso4()
+    model = MesoInception4()
     model.load_state_dict(torch.load(model_path))
     model = model.cuda()
 
@@ -28,7 +28,9 @@ def main():
     correct = 0
     count = 0
     real_count = 0
+    real_count_correct = 0
     df_count = 0
+    df_count_correct = 0
     total_loss = 0
     model.eval()
     for batch_idx, data in enumerate(test_dataset_loader):
@@ -43,14 +45,23 @@ def main():
             count+=1
             if (prediction[i]<0.2 and ground_truth[i]==0):
                 correct+=1
-                real_count+=1
-            elif(prediction[i]>=0.8 and ground_truth[i]==1):
+                real_count_correct+=1
+            elif(prediction[i]>=0.5 and ground_truth[i]==1):
                 correct+=1
+                df_count_correct+=1
+            #for real and df accuracy
+            if ground_truth[i]==0:
+                real_count+=1
+            elif ground_truth[i]==1:
                 df_count+=1
 
+    df_accuracy = df_count_correct/df_count
+    real_accuracy = real_count_correct/real_count
     accuracy = correct/count
     #send to tensorboard
     print("Test Accuracy is {}".format(accuracy))
+    print("Test Accuracy for real is {}".format(real_accuracy))
+    print("Test Accuracy for fake is {}".format(df_accuracy))
 
 
 

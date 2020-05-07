@@ -59,14 +59,14 @@ def validate(model, test_dataset_loader, writer,loss_func, epoch):
     gt=ground_truth.data.cpu().numpy()
     print("plotting validation heatmaps")
     if (pred[0]>0.5):
-            writer.add_figure('validate/heatmap'+str(epoch)+'_deepFake_pred',fig)
+        writer.add_figure('validate/heatmap'+str(epoch)+'_deepFake_pred',fig)
     else:
-            writer.add_figure('validate/heatmap'+str(epoch)+'_real_pred',fig)
+        writer.add_figure('validate/heatmap'+str(epoch)+'_real_pred',fig)
 
     if (gt[0]==1):
-            writer.add_figure('validate/heatmap'+str(epoch)+'_deepFake_gt',fig)
+        writer.add_figure('validate/heatmap'+str(epoch)+'_deepFake_gt',fig)
     else:
-            writer.add_figure('validate/heatmap'+str(epoch)+'_real_gt',fig)
+        writer.add_figure('validate/heatmap'+str(epoch)+'_real_gt',fig)
 
     img = image.data[0].cpu().numpy()
     img_min = img.min()
@@ -99,7 +99,7 @@ def main():
     #define model
     #TO DO import model
     #model = Meso4().cuda()
-    model = MesoInception4().cuda()
+    model = Meso4().cuda()
 
     #optimizer
     #I have multiple options we can try 
@@ -140,9 +140,7 @@ def main():
             ground_truth = ground_truth.cuda()
 
             #run through model and get prediction
-            
             prediction, heatmapout = model(image)
-            pdb.set_trace()
             
             #calculate loss
             #loss = loss_func_mse(prediction,ground_truth)
